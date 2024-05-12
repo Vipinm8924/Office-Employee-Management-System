@@ -22,15 +22,35 @@ def add_emp(request):
         salary = int(request.POST['salary'])
         bonus = int(request.POST['bonus'])
         phone = int(request.POST['phone'])
-        dept = int(request.POST['dept'])
-        role = int(request.POST['role'])
-        new_emp = Employee(first_name=first_name, last_name=last_name, salary=salary, bonus=bonus, phone=phone, dept_id= dept, role_id = role, hire_date = datetime.now())
+        dept_name = request.POST['dept']
+        role_name = request.POST['role']
+
+
+        try:
+            # Fetch Department instance using the department name
+            dept_instance = Department.objects.get(name=dept_name)
+        except Department.DoesNotExist:
+            return HttpResponse("Department does not exist")
+        
+        try:
+            # Fetch Role instance using the role name
+            role_instance = Role.objects.get(name=role_name)
+        except Role.DoesNotExist:
+            return HttpResponse("Role does not exist")
+        
+        # Similarly, you may need to fetch the Role instance if needed
+        
+        new_emp = Employee(first_name=first_name, last_name=last_name, salary=salary, bonus=bonus, phone=phone, dept=dept_instance, role=role_instance, hire_date=datetime.now())
         new_emp.save()
         return HttpResponse('Employee added Successfully')
     elif request.method == 'GET':
         return render(request, 'add_emp.html')
     else:
-        return HttpResponse("An Exception Occured! Employee Has Not Been Added")
+        return HttpResponse("An Exception Occurred! Employee Has Not Been Added")
+    
+
+
+
 
 def remove_emp(request, emp_id = 0):
     if emp_id:
